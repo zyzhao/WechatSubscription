@@ -9,5 +9,6 @@ WECHAT_ACCOUNT_TABLE = "wechat_account"
 
 BG_SERV_CRAWL_LOG_TABLE = "bg_crawler_log"
 
+APACHE_DIR = "/Library/WebServer/Documents/wechat/"
 
 

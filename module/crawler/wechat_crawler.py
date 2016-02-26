@@ -40,12 +40,15 @@ class WechatCrawler(object):
     def search(self, keyword="data"):
         url = "http://weixin.sogou.com/weixin?type=1&query={keyword}&ie=utf8".format(keyword=keyword)
         print url
+        cookie = cookielib.CookieJar()
+        handler=urllib2.HTTPCookieProcessor(cookie)
+        opener = urllib2.build_opener(handler)
         # req = requests.get(url)
         # req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.89 Safari/537.36')
-        _headers = self.head
-        req = urllib2.Request(url, None, _headers)
-        response = urllib2.urlopen(req)
-        _content = response.read()
+        # response = urllib2.urlopen(req)
+        req = self.opener.open(url)
+        _content = req.read()
+        print _content
         soup = BeautifulSoup(_content, 'html')
         wechat_acct = soup.find("label", {"name":"em_weixinhao"}).string
         self.wechat_acct = wechat_acct
@@ -59,14 +62,14 @@ class WechatCrawler(object):
         self.login_info = login_param
         return login_param
 
-    def get_article_url(self, url=""):
+    def get_article_url(self, url="", uuid="_tmp"):
         real_url = ""
         _url = self.domain + url
-        _headers = self.head
-        req = urllib2.Request(_url, None, _headers)
-        response = urllib2.urlopen(req)
-        _content = response.read()
-        print _content
+        req = self.opener.open(_url)
+        _content = req.read()
+        with open(config.APACHE_DIR + uuid + ".html", "wb") as f:
+            f.write(_content)
+        # print _content
 
         return real_url
 
@@ -82,10 +85,10 @@ class WechatCrawler(object):
         url = self.domain + "/gzhjs?" + login_info + _param
         print url
         # req = requests.get(url)
-        req = urllib2.Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.89 Safari/537.36')
-        response = urllib2.urlopen(req)
-        _content = response.read()
+        req = self.opener.open(url)
+        # req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.89 Safari/537.36')
+        # response = urllib2.urlopen(req)
+        _content = req.read()
 
         # soup = BeautifulSoup(req.text, 'html')
         _tmp = _content.replace("sogou.weixin_gzhcb(", "")
@@ -105,12 +108,15 @@ class WechatCrawler(object):
             xmlp = ET.XMLParser(encoding="utf-8")
             _item_xml = ET.fromstring(_item, parser=xmlp)
             ref_url = _item_xml.find("item").find("display").find("url").text
-            print _item_xml.find("item").find("display").find("title").text
-            print self.domain + ref_url
-            # self.get_article_url(ref_url)
+            # print _item_xml.find("item").find("display").find("title").text
+            # print self.domain + ref_url
+            _uuid = make_uuid()
+            self.get_article_url(ref_url, _uuid)
+
+
 
             _res = dict(
-                uuid=make_uuid(),
+                uuid=_uuid,
                 title=_item_xml.find("item").find("display").find("title").text,
                 content=_item_xml.find("item").find("display").find("content168").text,
                 url="",
@@ -146,7 +152,7 @@ class WechatCrawler(object):
 
     def get_wechat_articles(self, keyword=""):
         login_info = self.login(keyword)
-        self.get_articles(1, login_info)
+        self.get_articles(5, login_info)
 
 if __name__ == "__main__":
     wc = WechatCrawler("2016-02-20", "2016-02-23", mode="init")
