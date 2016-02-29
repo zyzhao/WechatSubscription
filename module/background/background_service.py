@@ -77,5 +77,5 @@ class BackgroundService(object):
 
 
 if __name__ == "__main__":
-    bgs = BackgroundService(mode="init")
+    bgs = BackgroundService(mode="override")
     bgs.run_wechat_crawler()

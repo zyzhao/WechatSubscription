@@ -1,0 +1,2 @@
+CELERY_SUBS_OTHER_SEARCHED_IDCN = "event_task_others_searched_idcn"
+CELERY_SUBS_OTHER_SEARCHED_PHONE = "event_task_others_searched_phone"
