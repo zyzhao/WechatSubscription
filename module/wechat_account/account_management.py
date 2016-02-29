@@ -53,5 +53,9 @@ class WechatAccount(object):
 
 if __name__ == "__main__":
     wa = WechatAccount()
-    wa.edit_account("36dashuju", "tech", ["big data", "test"])
-    print wa.show_accout()
+    # wa.edit_account("36dashuju", "tech", ["big data", "test"])
+    # print wa.show_accout()
+    _acct_list = [u"菜鸟教程", u"程序猿", u"大数据技术", u"大数据挖掘哪家强"]
+
+    res = [wa.edit_account(acct, tag=["Tech"]) for acct in _acct_list]
+

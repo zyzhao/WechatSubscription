@@ -15,11 +15,12 @@ import utils.date_helper as date_helper
 import urllib2
 import cookielib
 from utils.log import LOG
+import traceback
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-RAND_SLEEP = 1
+RAND_SLEEP = 2
 
 class WechatCrawler(object):
 
@@ -49,7 +50,6 @@ class WechatCrawler(object):
             'User-Agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36",
         }
 
-
     def search(self, keyword="data"):
         url = "http://weixin.sogou.com/weixin?type=1&query={keyword}&ie=utf8".format(keyword=keyword)
         LOG.info("Search Keyword: %s" % keyword)
@@ -68,7 +68,7 @@ class WechatCrawler(object):
         # _content = req.read()
         # print _content
         soup = BeautifulSoup(_content, 'html')
-        wechat_acct = soup.find("label", {"name":"em_weixinhao"}).string
+        wechat_acct = soup.find("label", {"name":"em_weixinhao"}).text
         wechat_name = soup.find("em").text
         self.wechat_acct = wechat_acct
         self.wechat_name = wechat_name
@@ -97,8 +97,15 @@ class WechatCrawler(object):
     def get_article_url(self, url="", uuid="_tmp"):
         real_url = ""
         _url = self.domain + url
-        req = self.opener.open(_url)
-        _content = req.read()
+        print _url
+        # req = self.opener.open(_url)
+        # _content = req.read()
+
+        _headers = self.head
+        req = urllib2.Request(_url, None, _headers)
+        response = urllib2.urlopen(req)
+        _content = response.read()
+
         with open(config.APACHE_DIR + uuid + ".html", "wb") as f:
             f.write(_content)
         return real_url
@@ -114,80 +121,102 @@ class WechatCrawler(object):
         url = self.domain + "/gzhjs?" + login_info + _param
         LOG.info("Crawling URL: " + url)
         # req = requests.get(url)
-        req = self.opener.open(url)
+
+        # req = self.opener.open(url)
+        # _content = req.read()
+
+        _headers = self.head
+        req = urllib2.Request(url, None, _headers)
+        response = urllib2.urlopen(req)
+        _content = response.read()
+
         # req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.89 Safari/537.36')
         # response = urllib2.urlopen(req)
-        _content = req.read()
 
-        # soup = BeautifulSoup(req.text, 'html')
-        _tmp = _content.replace("sogou.weixin_gzhcb(", "")
-        _tmp = _tmp.replace(")\n\n\n\n\n\n\n\n\n", "")
-        _tmp = _tmp.replace("\\/", "/")
-        _res_dict = eval(_tmp)
+        try:
+            # soup = BeautifulSoup(req.text, 'html')
+            _tmp = _content.replace("sogou.weixin_gzhcb(", "")
+            _tmp = _tmp.replace(")\n\n\n\n\n\n\n\n\n", "")
+            _tmp = _tmp.replace("\\/", "/")
+            _res_dict = eval(_tmp)
 
-        total_pages = _res_dict.get("totalPages")
+            total_pages = _res_dict.get("totalPages")
 
-        _items = _res_dict.get("items")
-        LOG.info( "Page: %s/%s" % (str(page), str(total_pages)))
-        # total_pages = 3
+            _items = _res_dict.get("items")
+            LOG.info( "Page: %s/%s" % (str(page), str(total_pages)))
+            # total_pages = 3
 
-        articles = []
-        num_of_articles_downloaded = 0
-        for _item in _items:
-            xmlp = ET.XMLParser(encoding="utf-8")
-            _item_xml = ET.fromstring(_item, parser=xmlp)
-            ref_url = _item_xml.find("item").find("display").find("url").text
-            # print _item_xml.find("item").find("display").find("title").text
-            # print self.domain + ref_url
-            _uuid = make_uuid()
+            articles = []
+            num_of_articles_downloaded = 0
+            for _item in _items:
+                xmlp = ET.XMLParser(encoding="utf-8")
+                _item_xml = ET.fromstring(_item, parser=xmlp)
+                ref_url = _item_xml.find("item").find("display").find("url").text
+                # print _item_xml.find("item").find("display").find("title").text
+                # print self.domain + ref_url
+                _uuid = make_uuid()
 
-            _res = dict(
-                uuid=_uuid,
-                title=_item_xml.find("item").find("display").find("title").text,
-                content=_item_xml.find("item").find("display").find("content168").text,
-                url="",
-                release_date=_item_xml.find("item").find("display").find("date").text,
-                wechat_acct=self.wechat_acct,
-                timestamp=date_helper.current_timestamp(),
-                unread=True,
-                tag=[]
-            )
-            with MongodbUtils(config.WECHAT_DB_IP, config.WECHAT_DB_PORT, config.WECHAT_COLLECTION, config.WECHAT_ARTICLE_SUMMARY_TABLE) as connect_db:
-                _query = dict(wechat_acct=self.wechat_acct, title=_res.get("title"))
-                exist_record = connect_db.find_one(_query)
-                if not exist_record:
-                    connect_db.insert(_res)
-                    _article_url = self.get_article_url(ref_url, _uuid)
-                    if _article_url:
-                        num_of_articles_downloaded += 1
-                else:
-
-                    if self.mode in ["init", "override"]:
-                        _end_of_process = False
-                        if self.mode in ["override"]:
-                            _old_uuid = exist_record.get("uuid", "")
-                            _res["uuid"] = _old_uuid
-                            connect_db.remove(_query)
-                            connect_db.insert(_res)
-                            _article_url = self.get_article_url(ref_url, _old_uuid)
-                            if _article_url:
-                                num_of_articles_downloaded += 1
-                        else:
-                            LOG.info("Already exist")
-
+                _res = dict(
+                    uuid=_uuid,
+                    title=_item_xml.find("item").find("display").find("title").text,
+                    content=_item_xml.find("item").find("display").find("content168").text,
+                    url="",
+                    release_date=_item_xml.find("item").find("display").find("date").text,
+                    wechat_acct=self.wechat_acct,
+                    timestamp=date_helper.current_timestamp(),
+                    unread=True,
+                    tag=[]
+                )
+                with MongodbUtils(config.WECHAT_DB_IP, config.WECHAT_DB_PORT, config.WECHAT_COLLECTION, config.WECHAT_ARTICLE_SUMMARY_TABLE) as connect_db:
+                    _query = dict(wechat_acct=self.wechat_acct, title=_res.get("title"))
+                    exist_record = connect_db.find_one(_query)
+                    if not exist_record:
+                        connect_db.insert(_res)
+                        try:
+                            _article_url = self.get_article_url(ref_url, _uuid)
+                        except:
+                            print traceback.format_exc()
+                            _article_url = ""
+                        if _article_url:
+                            num_of_articles_downloaded += 1
                     else:
-                        _end_of_process = True
-                        LOG.info("Meet the last article in DB")
-                        # LOG.info("End Process")
-                        break
-            # articles.append(_res)
-        LOG.info("%s pages are downloaded on this page" % num_of_articles_downloaded)
 
-        if (page < total_pages) and not _end_of_process:
-            LOG.info("Go to next page")
-            self.get_articles(page+1, login_info, keyword)
-        else:
-            return articles
+                        if self.mode in ["init", "override"]:
+                            _end_of_process = False
+                            if self.mode in ["override"]:
+                                _old_uuid = exist_record.get("uuid", "")
+                                _res["uuid"] = _old_uuid
+                                connect_db.remove(_query)
+                                connect_db.insert(_res)
+
+                                try:
+                                    _article_url = self.get_article_url(ref_url, _uuid)
+                                except:
+                                    print traceback.format_exc()
+                                    _article_url = ""
+
+                                if _article_url:
+                                    num_of_articles_downloaded += 1
+                            else:
+                                LOG.info("Already exist")
+
+                        else:
+                            _end_of_process = True
+                            LOG.info("Meet the last article in DB")
+                            # LOG.info("End Process")
+                            break
+                # articles.append(_res)
+            LOG.info("%s pages are downloaded on this page" % num_of_articles_downloaded)
+
+            if (page < total_pages) and not _end_of_process:
+                LOG.info("Go to next page")
+                self.get_articles(page+1, login_info, keyword)
+            else:
+                return articles
+        except:
+            print traceback.format_exc()
+            # print _content
+            return None
 
     def get_wechat_articles(self, keyword=""):
         LOG.info("Start to get data of account [%s]" % (keyword))
