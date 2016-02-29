@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from api.celery_app import celery_app
 from module.background.background_service import BackgroundService
+from utils.log import LOG
+
 
 @celery_app.task(name="period_hw_test")
 def celery_hello_world():
@@ -9,7 +11,8 @@ def celery_hello_world():
 
     :return:
     """
-
+    print "celery status check"
+    # LOG.info("celery status check")
     return 'hello world'
 
 
@@ -25,7 +28,8 @@ def celery_period_run_crawler():
     return "Done"
 
 
-
+if __name__ == '__main__':
+    celery_period_run_crawler.delay()
 
 
 

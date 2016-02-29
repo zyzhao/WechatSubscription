@@ -14,7 +14,7 @@ APACHE_DIR = "/Library/WebServer/Documents/wechat/"
 
 
 # rabbitmq 配置
-RMQ_BROKER_IP = "127.0.0.1"
+RMQ_BROKER_IP = "localhost"
 RMQ_BROKER_USER = "zhiyuan"
 RMQ_BROKER_PASS = "123456"
 RMQ_BROKER_PORT = '5672'

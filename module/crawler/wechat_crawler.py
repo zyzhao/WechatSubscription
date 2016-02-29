@@ -69,7 +69,7 @@ class WechatCrawler(object):
         # print _content
         soup = BeautifulSoup(_content, 'html')
         wechat_acct = soup.find("label", {"name":"em_weixinhao"}).string
-        wechat_name = soup.find("em").string
+        wechat_name = soup.find("em").text
         self.wechat_acct = wechat_acct
         self.wechat_name = wechat_name
         # print soup
@@ -105,7 +105,7 @@ class WechatCrawler(object):
 
     def get_articles(self, page, login_info, keyword=""):
         sleep_time = round(np.random.chisquare(RAND_SLEEP), 2)
-        print "Let me sleep %s sec." % str(sleep_time)
+        # print "Let me sleep %s sec." % str(sleep_time)
         time.sleep(sleep_time)
 
         _end_of_process = False
@@ -190,8 +190,11 @@ class WechatCrawler(object):
             return articles
 
     def get_wechat_articles(self, keyword=""):
+        LOG.info("Start to get data of account [%s]" % (keyword))
         login_info = self.login(keyword)
+        LOG.info("Finished getting login param of account [%s]" % (keyword))
         self.get_articles(1, login_info)
+        LOG.info("End process for account [%s]" % (keyword))
 
 if __name__ == "__main__":
     wc = WechatCrawler("2016-02-20", "2016-02-23", mode="update")

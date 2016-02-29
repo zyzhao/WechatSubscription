@@ -39,11 +39,11 @@ CELERYBEAT_SCHEDULE = {
 }
 
 
-
-CELERY_QUEUES = (
-    Queue('wechat_task', Exchange('wechat_task'), routing_key='wechat_task'),
-)
-
-CELERY_ROUTES = {
-    CELERY_SUBS_OTHER_SEARCHED_IDCN: {'queue': 'wechat_task', 'routing_key': 'wechat_task'},
-}
+#
+# CELERY_QUEUES = (
+#     Queue('wechat_task', Exchange('wechat_task'), routing_key='wechat_task'),
+# )
+#
+# CELERY_ROUTES = {
+#     "period_hw_test": {'queue': 'wechat_task', 'routing_key': 'wechat_task'},
+# }
