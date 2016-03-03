@@ -5,6 +5,8 @@ import threading
 import time
 import json
 import date_helper
+from utils.log import LOG
+import numpy as np
 
 def get_func_time(func):
     @wraps(func)
@@ -28,6 +30,64 @@ def get_func_time(func):
         print "[%s] Finished (%s sec used)" % (func_name, str(time_diff))
         return res
     return record_time
+
+
+def try_except(func):
+    """
+    传统的捕获异常
+
+    :param func:
+    :return:
+    """
+    @wraps(func)
+    def catch_error(*args, **kwargs):
+        try:
+            res = func(*args, **kwargs)
+
+        except Exception as e:
+            LOG.error(traceback.format_exc())
+            # print traceback.format_exc()
+            return None
+        return res
+    return catch_error
+
+
+def try_except_parse(func):
+    """
+    出现解析异常时打印content
+
+    :param func:
+    :return:
+    """
+    @wraps(func)
+    def catch_error(*args, **kwargs):
+        try:
+            res = func(*args, **kwargs)
+
+        except Exception as e:
+            LOG.error(traceback.format_exc())
+            LOG.info("================content start================")
+            _content = kwargs.get("content")
+            _content = _content if _content else args[0]
+            print _content
+            LOG.info("================content end================")
+            return None
+        return res
+    return catch_error
+
+
+
+def simulate_human(seed, offset):
+    def auto_sleep(func):
+        @wraps(func)
+        def record_time(*args, **kwargs):
+            res = func(*args, **kwargs)
+            sleep_time = round(np.random.chisquare(seed), 2) + offset
+            LOG.info("I'm gona to sleep for %s sec." % (str(sleep_time)))
+            time.sleep(sleep_time)
+            return res
+        return record_time
+    return auto_sleep
 
 
 

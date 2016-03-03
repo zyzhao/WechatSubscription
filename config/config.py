@@ -12,8 +12,8 @@ BG_SERV_CRAWL_LOG_TABLE = "bg_crawler_log"
 
 APACHE_DIR = "/Library/WebServer/Documents/wechat/"
 
-
 # rabbitmq 配置
+
 RMQ_BROKER_IP = "localhost"
 RMQ_BROKER_USER = "zhiyuan"
 RMQ_BROKER_PASS = "123456"
