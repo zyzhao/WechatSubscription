@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <!--<meta http-equiv="refresh" content="60">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>PAMS</title>
+    <link href="{{url_for('static', filename='img/favicon.png') }}" type="image/png" rel="icon">
+    <link href="{{url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet">
+
+    <!-- Toastr style -->
+    <link href="{{url_for('static', filename='css/toastr.min.css') }}" rel="stylesheet">
+
+    <!-- Gritter -->
+    <link href="{{url_for('static', filename='css/jquery.gritter.css') }}" rel="stylesheet">
+
+    <link href="{{url_for('static', filename='css/animate.css') }}" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/ugtm-custom.css') }}" rel="stylesheet">
+
+
+
+    {% block header %}
+    <!--插入页码专有css-->
+
+    {% endblock %}
+
+
+</head>
+
+<body>
+<div id="wrapper">
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+                        <span>
+                            <img alt="image" class="img-circle" src="{{url_for('static', filename='img/python_header.png') }}" />
+                        </span>
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear"> <span class="block m-t-xs">
+                                <strong class="font-bold">Public Account Management System</strong>
+                        <!--<span class="label label-success pull-right">v1.0.00</span>-->
+                             </span> </span>
+                        </a>
+
+                    </div>
+                    <div class="logo-element">
+                        Public Account Management System
+                    </div>
+                </li>
+                <li class="landing_link">
+                    <a href="/wechat/article_list"><i class="fa fa-th-large"></i>
+                        <span class="nav-label sidebar-custom">Articles</span>
+                    </a>
+
+                </li>
+                <li class="landing_link">
+                    <a href="/wechat/account_list"><i class="fa fa-th-large"></i>
+                        <span class="nav-label sidebar-custom">Accounts</span>
+                    </a>
+                </li>
+
+
+                <!--<li class="">-->
+                    <!--<a href="#"><i class="fa fa-flash"></i> <span class="nav-label sidebar-custom">推送事件TimeLine</span><span class="fa arrow"></span></a>-->
+                    <!--<ul class="nav nav-second-level collapse">-->
+                        <!--<li><a href="/ugtm/event/others_searched_idcn" class="sidebar-custom"><i class="fa fa-cloud-download" ></i>身份证被查询过</a></li>-->
+                        <!--<li><a href="/ugtm/event/others_searched_phone" class="sidebar-custom"><i class="fa fa-cloud-download" ></i>电话被查询过</a></li>-->
+
+                    <!--</ul>-->
+                <!--</li>-->
+
+            </ul>
+
+        </div>
+    </nav>
+
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div class="row border-bottom">
+            <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <div class="navbar-header">
+                    <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+                </div>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                            <i class="fa fa-envelope"></i>  <span class="label label-warning">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-messages">
+                            <li>
+                                <div class="text-center link-block">
+                                    <a href="#">
+                                        <i class="fa fa-envelope"></i> <strong>Read All Messages</strong>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                            <i class="fa fa-bell"></i>  <span class="label label-primary">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-alerts">  `
+                            <li>
+                                <div class="text-center link-block">
+                                    <a href="#">
+                                        <strong>See All Alerts</strong>
+                                        <i class="fa fa-angle-right"></i>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+
+            </nav>
+        </div>
+
+
+        {% block content %}
+            hello world
+        {% endblock %}
+
+
+
+    </div>
+
+</div>
+
+<!-- Mainly scripts -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.metisMenu.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.slimscroll.min.js') }}"></script>
+
+<!-- Flot -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.flot.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.flot.tooltip.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.flot.spline.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.flot.resize.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.flot.pie.js') }}"></script>
+
+<!-- Peity -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.peity.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/peity-demo.js') }}"></script>
+
+<!-- Custom and plugin javascript -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/inspinia.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/pace.min.js') }}"></script>
+
+<!-- jQuery UI -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery-ui.min.js') }}"></script>
+
+<!-- GITTER -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.gritter.min.js') }}"></script>
+
+<!-- Sparkline -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.sparkline.min.js') }}"></script>
+
+<!-- Sparkline demo data  -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/sparkline-demo.js') }}"></script>
+
+<!-- ChartJS-->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/Chart.min.js') }}"></script>
+
+<!-- Toastr -->
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/toastr.min.js') }}"></script>
+
+{% block footer %}
+
+{% endblock %}
+
+</body>
+</html>

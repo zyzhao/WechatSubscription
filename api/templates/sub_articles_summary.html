@@ -1,0 +1,170 @@
+{% extends "template_main.html" %}
+
+{% block content %}
+    <div class="row">
+
+        <div class="row wrapper border-bottom white-bg page-heading">
+            <div class="col-lg-10">
+                <h2>TimeLine</h2>
+                <ol class="breadcrumb">
+                    <li>
+                        <a href="/ugtm/main">Dashboard</a>
+                    </li>
+                    <li>
+                        <a>推送事件TimeLine</a>
+                    </li>
+                    <li class="active">
+                        <strong></strong>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+
+
+                        <div class="search-form">
+                            <form action="" method="get">
+                                <div class="input-group">
+                                    <input type="text" placeholder="输入通知机构名/UGID进行搜索" name="event_search" class="form-control input-lg">
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-lg btn-primary" type="submit">
+                                            搜索
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="row wrapper border-bottom white-bg page-heading">
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-11">
+                                <div class="subs_details ibox float-e-margins">
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row wrapper border-bottom white-bg page-heading">
+                            <div class="col-lg-3"></div>
+                            <div class="col-lg-9">
+                                <div class="ibox float-e-margins">
+                                    <div class="col-xs-6">
+
+                                        <button id="more_event" class=" btn btn-primary btn-block m-t ">
+                                            <i class="fa fa-arrow-down"></i><span id="more_event_sp">查看更多(1)</span>
+                                        </button>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block footer %}
+
+<script>
+    var page_num = 0;
+    $("#more_event").click(load_more);
+    function load_more(){
+        page_num += 1;
+        var page_num_str = page_num.toString();
+
+        var _url = "/wechat/datajs/article_list?"+ "page_num="+page_num_str
+        console.log(_url)
+
+        $.ajax({
+            url: _url,
+            type: "get",
+            success:  function(dt){
+                articles = dt["article_list"];
+
+                 for(var i=0; i< articles.length; i++){
+                    var _atricle = articles[i];
+                    var title = _atricle["title"];
+                    var summary = _atricle["content"];
+                    var sourcename = _atricle["sourcename"];
+                    var uuid = _atricle["uuid"];
+                    var ref_url = _atricle["site"];
+                    var account = _atricle["wechat_acct"];
+                    var related_links = _atricle["related_url"];
+                    var read_label = ( _atricle["unread"] == true) ?
+                            '<span class="label label-default pull-right">已读</span>':
+                            '<span class="label label-warning pull-right">未读</span>';
+
+                    if(ref_url == ""){
+                        valid_url = "http://localhost/wechat/" + uuid + ".html"
+                    }else{
+                        valid_url = ref_url
+                    }
+
+
+                    _html_related_url = ""
+                    if( related_links != undefined){
+                        for(var j=0; j< related_links.length; j++){
+                            _html_related_url = _html_related_url + '<a class="btn btn-xs btn-white" href="' + related_links[j] + '" target="_blank" style="margin-right:5px"><i class="fa fa-link"></i> Link-' + (j+1).toString() + '</a>'
+
+                        }
+                        console.log(_html_related_url);
+                    }
+
+                    $(".subs_details").append(
+                        '<div class="timeline-item" style="margin-bottom:15px">' +
+                        '<div class="row">' +
+                        '<div class="col-xs-3 date">' +
+                            '<i class="fa fa-bell"></i>'+
+                            '<span>'+sourcename+'</span>'+
+                            '<br/>'+
+                        '</div>'+
+                        '<div class="col-xs-9 content">'+
+                            '<p class="m-b-xs" style="font-size: 18px">' +
+                            '<a href="' + valid_url  + '" target="_blank">' +
+                            '<strong>'+title+'</strong>' + '</a>' +
+                                read_label+
+                            '</p>'+
+                            '<p style="font-size: 16px">'+summary+'...'+
+                            '</p>'+
+                            '<p class="">' + _html_related_url +
+                            '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>'
+
+                    );
+                    $('#more_event').text('查看更多('+page_num_str+')');
+                }
+            }
+        });
+
+
+
+
+    }
+
+    $(document).ready(function(){
+        load_more()
+    })
+</script>
+
+
+{% endblock %}
+
+
+

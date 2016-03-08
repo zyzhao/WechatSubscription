@@ -32,9 +32,9 @@ CELERYBEAT_SCHEDULE = {
         'task': 'period_hw_test',
         'schedule': crontab()
     },
-    "period_auto_run_crawler": {
+    "periodoc_auto_run_crawler": {
         'task': 'period_run_crawler',
-        'schedule': crontab(hour='0,6,12,18', minute=0),
+        'schedule': crontab(hour='10', minute=0),
     }
 }
 

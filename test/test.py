@@ -182,8 +182,6 @@ _content = response.read()
 
 
 
-
-
 def print_arg(func):
     # @wraps(func)
     def catch_error(*args, **kwargs):
@@ -204,23 +202,21 @@ def test_arg(a,b,c=1,d=2):
 test_arg(1,2,c=3,d=4)
 
 
+url = "http://www.baidu.com/link?url=WDa5mcjqYSIk79zr3NZ1m9aO5gfyon6qxOjvWHAJW-_7xAf2RE5xAWDEewZiZbu6MTm7L8pN-7SUSIh8nCKTl_"
+
+
+import requests
+import urllib2
+
+req = urllib2.Request(url)
+response = urllib2.urlopen(req)
+_content = response.read()
+
+response["Location"]
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+requests.head(url).headers["location"]
 
 
 

@@ -13,7 +13,7 @@ import config.config as config
 from utils.general_tools import make_uuid
 import utils.date_helper as date_helper
 import urllib2
-
+from module.crawler.wechat_crawler import WechatCrawler
 
 class WechatAccount(object):
     def __init__(self):
@@ -28,6 +28,12 @@ class WechatAccount(object):
             res = [acct for acct in _cursor]
 
         return res
+
+    def add_account(self, keyword=""):
+        if keyword:
+            wc = WechatCrawler()
+            wc.act_search_account(keyword)
+        return "Done"
 
     def edit_account(self, acct, category="", tag=[]):
         _message = "Account name is needed"
@@ -57,5 +63,5 @@ if __name__ == "__main__":
     # print wa.show_accout()
     _acct_list = [u"菜鸟教程", u"程序猿", u"大数据技术", u"大数据挖掘哪家强"]
 
-    res = [wa.edit_account(acct, tag=["Tech"]) for acct in _acct_list]
+    res = [wa.add_account(acct) for acct in _acct_list]
 

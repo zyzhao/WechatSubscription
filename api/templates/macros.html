@@ -1,0 +1,51 @@
+{% macro alert_message(messages) %}
+    <div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'message' %}
+                        <div class="alert alert-success alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            <strong>Well Done!</strong> {{ message }}</div>
+                    {% else %}
+                        <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span></button>
+                            <strong>Warning!</strong> {{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+{% endmacro %}
+
+
+{% macro show_notif_msg(subs_notifs) %}
+    {% for subs_details in subs_notifs %}
+        <div class="timeline-item">
+            <div class="row">
+                <div class="col-xs-3 date">
+
+                    <i class="fa fa-bell"></i>
+                    <span>{{ subs_details["search_dt"] }}</span>
+                    <br/>
+                </div>
+                <div class="col-xs-9 content no-top-border">
+                    <p class="m-b-xs" style="font-size: 18px"><strong>{{ subs_details["subs_org"] }}</strong>
+                        {% if subs_details["subs_read"] == true %}
+                            <span class="label label-default pull-right">已读</span>
+                        {% else %}
+                            <span class="label label-warning pull-right">未读</span>
+                        {% endif %}
+                    </p>
+
+                    <p style="font-size: 16px">{{ subs_details["subs_msg"] }}...
+                        <strong class="text-navy">(查询来自: {{ subs_details["search_org"] }})</strong></p>
+
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endmacro %}

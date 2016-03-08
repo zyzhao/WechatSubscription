@@ -8,6 +8,7 @@ import date_helper
 from utils.log import LOG
 import numpy as np
 
+
 def get_func_time(func):
     @wraps(func)
     def record_time(*args, **kwargs):
@@ -66,11 +67,11 @@ def try_except_parse(func):
 
         except Exception as e:
             LOG.error(traceback.format_exc())
-            LOG.info("================content start================")
+            print("================content start================")
             _content = kwargs.get("content")
             _content = _content if _content else args[0]
             print _content
-            LOG.info("================content end================")
+            print("================content end================")
             return None
         return res
     return catch_error

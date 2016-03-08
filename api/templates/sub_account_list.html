@@ -1,0 +1,166 @@
+{% extends "template_main.html" %}
+
+{% block content %}
+    <div class="row">
+
+        <!--<div class="row wrapper border-bottom white-bg page-heading">-->
+            <!--<div class="col-lg-10">-->
+                <!--<h2>TimeLine</h2>-->
+                <!--<ol class="breadcrumb">-->
+                    <!--<li>-->
+                        <!--<a href="/ugtm/main">Dashboard</a>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<a>推送事件TimeLine</a>-->
+                    <!--</li>-->
+                    <!--<li class="active">-->
+                        <!--<strong></strong>-->
+                    <!--</li>-->
+                <!--</ol>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+
+                        <div class="search-form">
+                            <form action="/wechat/account_list/add" method="get" >
+                                <div class="input-group">
+                                    <input type="text" placeholder="搜索" name="query" class="form-control input-lg">
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-lg btn-primary" type="submit">
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div id="acct-list" class="" style="display: block;"></div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block footer %}
+
+<script>
+   // 对 Task表分页加载
+    function drawTable(data) {
+        var cols = ["account_name", "account", "category", "status", "timestamp_str"]
+        var cols_shown = ["Account Name", "Account", "Category", "Status", "Timestamp"]
+        var _html_table = '<table  class="table table-striped">'
+        if(data.length > 0){
+            var _html_thead = "<thead><tr>"
+
+            // 如果给定列名为空, 则默认取所有列
+            if(cols.length < 1){
+                for(var k in data[0]){
+                    cols[cols.length] = k
+                }
+                cols_shown = cols
+            }
+            // 构建表头
+            for(var _th in cols_shown){
+                _html_thead = _html_thead + "<th>" + cols_shown[_th] + "</th>"
+            }
+
+            _html_thead = _html_thead + "</tr></thead>"
+
+            // 构建行
+            var _html_tbody = "<tbody>"
+            for (var i = 0; i < data.length; i++) {
+                var row = "<tr>"
+                for(var j in cols){
+                    _rpt_id = data[i]["rpt_id"]
+                    if(cols[j] == "task_type"){
+                        // 定制样式
+                        if (data[i][cols[j]] == "manul"){
+                            row = row + "<td>" + '<i class="fa fa-user" ></i>' + "</td>"
+                        }else if(data[i][cols[j]] == "auto"){
+                            row = row + "<td>" + '<i class="fa fa-gear" ></i>' + "</td>"
+                        }
+                    }else if(cols[j] == "warning"){
+                        // 定制样式
+                        if (data[i][cols[j]] == true){
+                            row = row + "<td>" + '<i class="fa fa-warning fa-fw font-yellow"></i>' + "</td>"
+                        }else if(data[i][cols[j]] == false){
+                            row = row + "<td>" + '<i class="fa fa-check-square fa-fw font-green"></i>' + "</td>"
+                        }
+                    }else if(cols[j] == "?status"){
+                        // 定制样式
+                        if (data[i][cols[j]] == "RUNNING"){
+                            row = row + "<td>" + '<a class="btn btn-default btn-sm disabled" target="_blank" style="background-color: #F8F8F8;" href="/usergrid/validation/task/view?rpt_id=' + _rpt_id + '">报告运行中</a>' + "</td>"
+                        }else{
+                            row = row + "<td>" + '<a class="btn btn-default btn-sm" style="background-color: #F8F8F8" href="#" data-href="/usergrid/validation/task/run?rpt_id=' + _rpt_id + '" data-toggle="modal" data-target="#confirm-update">更新</a><a class="btn btn-sm btn-danger" href="#" data-href="/usergrid/validation/task/del?rpt_id=' + _rpt_id + '" data-toggle="modal" data-target="#confirm-delete">删除</a>' + "</td>"
+
+                        }
+                    }else if(cols[j] == "check"){
+                        // 定制样式
+                        row = row + "<td>" + '<a class="btn btn-sm btn-info" target="_blank" href="/usergrid/validation/task/view?rpt_id=' + _rpt_id + '">查看</a>' + "</td>"
+                    }else{
+                        row = row + "<td>" + data[i][cols[j]] + "</td>"
+                    }
+
+
+                }
+                row = row + "</tr>"
+                _html_tbody = _html_tbody + row
+            }
+            _html_tbody = _html_tbody + "</tbody>"
+        }
+        _html_table = _html_table + _html_thead + _html_tbody + "</table>"
+        $("#acct-list").html(_html_table)
+    }
+
+
+    function ajaxGetTaskList(pn) {
+        var _url = "/wechat/datajs/account_list"
+        $.ajax({
+            url: _url,
+            type: "get",
+            success:  function(dt){
+                tb = dt["account_list"]
+                drawTable(tb)
+
+                <!--total_page = dt["pagination"]["max"]-->
+                <!--shown_page_num = dt["pagination"]["shown"]-->
+
+                <!--$('#task-list').append("<div id='page-selection' style='text-align:center;'></div>")-->
+                <!--$('#page-selection').bootpag({-->
+                    <!--total: total_page,-->
+                    <!--page: pn,-->
+                    <!--maxVisible: shown_page_num,-->
+                    <!--href: "javascript:void(0);",-->
+                    <!--hrefVariable:"",-->
+                    <!--firstLastUse: true,-->
+                    <!--first: "First",-->
+                    <!--last: "Last",-->
+                <!--}).on("page", function(event, /* page number here */ num){-->
+                     <!--ajaxGetTaskList(num)-->
+                <!--});-->
+
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        ajaxGetTaskList()
+    });
+</script>
+
+
+{% endblock %}
+
+
+

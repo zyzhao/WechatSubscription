@@ -27,20 +27,19 @@ def celery_period_run_crawler():
 
     return "Done"
 
-@celery_app.task(name="period_run_crawler_init")
-def celery_period_run_crawler_init():
+@celery_app.task(name="run_crawler_account")
+def celery_run_crawler_account(account=""):
     """
     Run web crawler to get new articles
     :return:
     """
     bgs = BackgroundService(mode="init")
-    bgs.run_wechat_crawler()
+    bgs.run_wechat_crawler_account(account)
 
     return "Done"
 
-
 if __name__ == '__main__':
-    celery_period_run_crawler_init.delay()
+    celery_period_run_crawler.delay()
 
 
 

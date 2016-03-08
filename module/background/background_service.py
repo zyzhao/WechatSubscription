@@ -45,54 +45,27 @@ class BackgroundService(object):
                 acct = ""
         return acct
 
-    def get_last_crawl_tsp(self, acct=""):
-        if acct:
-            query = {"account": acct}
-        else:
-            query = {}
-
-        with MongodbUtils(config.WECHAT_DB_IP, config.WECHAT_DB_PORT, config.WECHAT_COLLECTION,
-                          config.WECHAT_ACCOUNT_TABLE) as connect_db:
-            _cursor = connect_db.find({"account": acct}).sort([("timestamp", 1)])
-            _last = _cursor[0]
-            _tsp = _last.get("timestamp", None)
-        return _tsp
-
-    # @threads(2)
-    def crawl_account(self, acct):
-        print "Crawling account: %s" % acct
-        try:
-            st = time.time()
-            crawler = WechatCrawler(mode=self.mode)
-            crawler.get_wechat_articles(acct)
-            ed = time.time()
-            status = "success"
-            message = ""
-        except:
-            st = time.time()
-            ed = time.time()
-            status = "failed"
-            message = traceback.format_exc()
-            print message
-
-        with MongodbUtils(config.WECHAT_DB_IP, config.WECHAT_DB_PORT, config.WECHAT_COLLECTION,
-                          config.BG_SERV_CRAWL_LOG_TABLE) as connect_db:
-            connect_db.insert(dict(start_date=st, end_date=ed, message=message,
-                                   account=acct, status=status))
-
-        return "Done"
-
     def run_wechat_crawler(self):
+        all_finished = False
 
-        acct = self.random_select_account()
-        LOG.info("Select account: %s" % acct)
+        while not all_finished:
+            acct = self.random_select_account()
+            if acct:
+                LOG.info("Select account: %s" % acct)
+                crawler = WechatCrawler( mode=self.mode)
+                crawler.run_crawl_account_articles(acct)
+            else:
+                all_finished = True
+                LOG.info("All accounts have been updated today")
+                break
+
+    def run_wechat_crawler_account(self, account):
+        LOG.info("Select account: %s" % account)
         crawler = WechatCrawler( mode=self.mode)
-        crawler.run_crawl_account_articles(acct)
-
-        # return res
+        crawler.run_crawl_account_articles(account)
 
 
 if __name__ == "__main__":
     bgs = BackgroundService(mode="update")
-    print bgs.random_select_account()
+    # print bgs.random_select_account()
     bgs.run_wechat_crawler()

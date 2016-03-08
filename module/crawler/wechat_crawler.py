@@ -18,6 +18,8 @@ import cookielib
 from utils.log import LOG
 import traceback
 from module.crawler.web_browser import WebBrowser
+from module.crawler.baidu_crawler import BaiduCrawler
+
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -122,7 +124,7 @@ class WechatCrawler(object):
         self.url_generator = url_generator
         self.url_generator_js = url_generator_js
 
-    @simulate_human(30, 10)
+    @simulate_human(20, 5)
     def browser_account_page(self, page=1):
         url = self.url_generator_js(page)
         LOG.info("Visit account page: %s " % (url))
@@ -155,7 +157,7 @@ class WechatCrawler(object):
             _res = dict(
                 uuid=_uuid,
                 title=self.browser.get_xml_node(_item_xml, "item/display/title"),
-                content=_item_xml.find("item").find("display").find("content168").text,
+                content=self.browser.get_xml_node(_item_xml, "item/display/content168"),
                 site=self.browser.get_xml_node(_item_xml, "item/display/site"),
                 url=self.browser.get_xml_node(_item_xml, "item/display/url"),
                 sourcename=self.browser.get_xml_node(_item_xml, "item/display/sourcename"),
@@ -165,6 +167,7 @@ class WechatCrawler(object):
                 unread=True,
                 tag=[]
             )
+            _res["related_url"] = BaiduCrawler().get_related_links(_res.get("title", ""))
 
             LOG.info("Reading article: %s" % (_res.get("title")))
             LOG.info("Source site: %s" % (_res.get("site")))
@@ -199,7 +202,7 @@ class WechatCrawler(object):
         uuid = item.get("uuid", "")
 
         if not refer_url:
-            LOG.info("There is not refered URL. Try to download the content through original url")
+            LOG.info("There is no reference URL. Try to download the content through original url")
             _url = self.domain + article_url
             article_content = self.browser.get_url_content(_url)
             with open(config.APACHE_DIR + uuid + ".html", "wb") as f:
@@ -220,7 +223,7 @@ class WechatCrawler(object):
             while (not _end_process):
                 _acct_page_content = self.browser_account_page(_page)
                 _end_process = self.parse_account_page(_acct_page_content)
-                if _page > 5 and not _end_process:
+                if _page > 20 and not _end_process:
                     _end_process = True
                 _page += 1
             self.update_accout_status(self.wechat_acct, "Done")
@@ -235,7 +238,6 @@ class WechatCrawler(object):
                     "timestamp": date_helper.current_timestamp(),
                     "timestamp_str": date_helper.current_date()
                 }})
-
 
 
     def get_article_url(self, url="", uuid="_tmp"):
